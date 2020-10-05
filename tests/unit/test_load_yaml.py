@@ -1,5 +1,4 @@
-import io
-from azepi._helpers import load_yaml, dump_yaml
+from azepi._helpers import load_yaml, dump_yaml_into_str
 
 
 INPUT1 = '''
@@ -65,12 +64,7 @@ OUTPUT3 = [
 def test_load_yaml_with_single_document():
     assert load_yaml(INPUT1) == OUTPUT1
 
-    try:
-        stream = io.StringIO()
-        dump_yaml(load_yaml(INPUT1), stream=stream)
-        dumped = stream.getvalue()
-    finally:
-        stream.close()
+    dumped = dump_yaml_into_str(load_yaml(INPUT1))
 
     assert dumped.strip() == OUTPUT2.strip()
 

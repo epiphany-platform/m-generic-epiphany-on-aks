@@ -1,3 +1,4 @@
+import io
 import sys
 import copy
 import pathlib
@@ -24,7 +25,7 @@ def memoize(function):
 
 @memoize
 def get_path(a_str):
-    """Memoized path getter."""
+    """Create and return Path (memoized)."""
     return pathlib.Path(a_str).resolve()
 
 
@@ -124,7 +125,7 @@ def load_yaml(path_or_str):
     return clean(loaded)
 
 
-def dump_yaml(list_or_str, *, stream=sys.stdout):
+def dump_yaml(list_or_dict, *, stream=sys.stdout):
     """Print yaml document(s)."""
 
     yaml = ruamel.yaml.YAML()
@@ -132,11 +133,24 @@ def dump_yaml(list_or_str, *, stream=sys.stdout):
     yaml.default_flow_style = False
     yaml.indent(mapping=2, sequence=4, offset=2)
 
-    if isinstance(list_or_str, list):
-        yaml.dump_all(list_or_str, stream)
+    if isinstance(list_or_dict, list):
+        yaml.dump_all(list_or_dict, stream)
         return
 
-    yaml.dump(list_or_str, stream)
+    yaml.dump(list_or_dict, stream)
+
+
+def dump_yaml_into_str(list_or_dict):
+    """Print yaml document(s) into a string."""
+
+    try:
+        stream = io.StringIO()
+        dump_yaml(list_or_dict, stream=stream)
+        output = stream.getvalue()
+    finally:
+        stream.close()
+
+    return output
 
 
 def to_literal_scalar(a_str):
@@ -154,7 +168,7 @@ def udiff(str_a, str_b, *, number_of_context_lines=0):
     diff_generator = difflib.unified_diff(lines_a,
                                           lines_b,
                                           n=number_of_context_lines)
-    # Skip two unneeded lines
+    # Conditionally skip two unneeded lines
     diff_lines = list(diff_generator)[2:]
 
     diff_str = "".join(diff_lines)
