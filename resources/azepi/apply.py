@@ -33,7 +33,8 @@ def _run_epicli_apply(v):
         return rc
 
     finally:
-        v["epiphany_file"].unlink(missing_ok=True)
+        if v["epiphany_file"].exists():
+            v["epiphany_file"].unlink()
 
 
 def _update_state_file(v):
