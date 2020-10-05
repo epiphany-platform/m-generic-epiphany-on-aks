@@ -17,8 +17,8 @@ def _diff_module_configs(v):
     config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
 
     return udiff(
-        dump_yaml_into_str(sorted_dict(state)).strip(),
-        dump_yaml_into_str(sorted_dict(config)).strip(),
+        dump_yaml_into_str(sorted_dict(state)),
+        dump_yaml_into_str(sorted_dict(config)),
     ).strip()
 
 
