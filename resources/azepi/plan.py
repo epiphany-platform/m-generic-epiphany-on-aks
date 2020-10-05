@@ -1,5 +1,4 @@
 import sys
-
 from ._helpers import get_path, load_yaml, dump_yaml_into_str, sorted_dict, udiff
 
 

@@ -1,5 +1,4 @@
 import sys
-
 from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml, dump_yaml_into_str, to_literal_scalar
 
 
@@ -63,32 +62,32 @@ kind: {M_MODULE_SHORT}-config
 '''
 
 
-def _get_enabled_components(epiphany_cluster):
+def _get_enabled_components(cluster):
     enabled_components = [
         (key, value)
-        for key, value in epiphany_cluster["specification"]["components"].items()
+        for key, value in cluster["specification"]["components"].items()
         if int(value["count"]) > 0
     ]
     return enabled_components
 
 
-def _get_dummy_virtual_machines(v, count):
-    virtual_machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
+def _get_dummy_machines(v, count):
+    machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
     return [
-        combine(virtual_machine_template, {
+        combine(machine_template, {
             "name": "default-vm-" + str(index + 1),
         })
         for index in range(count)
     ]
 
 
-def _process_epiphany_cluster(v):
+def _process_cluster(v):
     """Process the main cluster document."""
 
-    epiphany_cluster_template = load_yaml(MINIMAL_EPIPHANY_CLUSTER)
+    cluster_template = load_yaml(MINIMAL_EPIPHANY_CLUSTER)
 
-    epiphany_cluster = combine(epiphany_cluster_template, {
+    cluster = combine(cluster_template, {
         "name": v["M_MODULE_SHORT"],
         "provider": "any",
         "specification": {
@@ -99,10 +98,10 @@ def _process_epiphany_cluster(v):
         },
     })
 
-    return epiphany_cluster
+    return cluster
 
 
-def _process_virtual_machines(v, epiphany_cluster):
+def _process_machines(v, cluster):
     """Process virtual machines."""
 
     def read_vms_from_state_file():
@@ -120,11 +119,11 @@ def _process_virtual_machines(v, epiphany_cluster):
 
         return vms
 
-    def derive_virtual_machines(vms):
-        virtual_machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
+    def derive_machines(vms):
+        machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
-        virtual_machines = [
-            combine(virtual_machine_template, {
+        machines = [
+            combine(machine_template, {
                 "name": "default-" + vm_name,
                 "provider": "any",
                 "specification": {
@@ -135,58 +134,58 @@ def _process_virtual_machines(v, epiphany_cluster):
             for vm_name, vm_ip in vms
         ]
 
-        return virtual_machines
+        return machines
 
-    def assign_virtual_machines_to_components(virtual_machines, epiphany_cluster):
+    def assign_machines_to_components(machines, cluster):
         number_of_required_vms = sum(
             int(value["count"])
-            for _, value in _get_enabled_components(epiphany_cluster)
+            for _, value in _get_enabled_components(cluster)
         )
 
-        if number_of_required_vms > len(virtual_machines):
+        if number_of_required_vms > len(machines):
             raise Exception("not enough vms available")
 
         # Convert virtual machine list to iterator
-        virtual_machines = iter(virtual_machines)
+        machines = iter(machines)
 
-        epiphany_cluster = combine(epiphany_cluster, {
+        cluster = combine(cluster, {
             "specification": {
                 "components": {
                     key: {
                         "machines": [
-                            next(virtual_machines)["name"]
+                            next(machines)["name"]
                             for _ in range(int(value["count"]))
                         ],
                     }
-                    for key, value in _get_enabled_components(epiphany_cluster)
+                    for key, value in _get_enabled_components(cluster)
                 },
             },
         })
 
-        return epiphany_cluster
+        return cluster
 
     try:
         # Read data from the state file
         vms = read_vms_from_state_file()
-        virtual_machines = derive_virtual_machines(vms)
+        machines = derive_machines(vms)
     except (FileNotFoundError, KeyError):
         # Fallback to dummy values if there is no state to read
         vms = []
-        virtual_machines = _get_dummy_virtual_machines(v, 4)
+        machines = _get_dummy_machines(v, 4)
 
-    epiphany_cluster = assign_virtual_machines_to_components(virtual_machines, epiphany_cluster)
+    cluster = assign_machines_to_components(machines, cluster)
 
-    return virtual_machines, epiphany_cluster
+    return machines, cluster
 
 
-def _process_components(v, epiphany_cluster):
+def _process_components(v, cluster):
     """Process component defaults."""
 
     components = [
         combine(load_yaml(v["template_dir"] / "configuration" / (key + ".yml")), {
             "provider": "any",
         })
-        for key, _ in _get_enabled_components(epiphany_cluster)
+        for key, _ in _get_enabled_components(cluster)
     ]
 
     return components
@@ -279,15 +278,15 @@ def main(variables={}):
     v["backup_file"] = get_path(str(v["module_dir"] / (v["M_CONFIG_NAME"] + ".backup")))
     v["state_file"] = get_path(str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
 
-    epiphany_cluster = _process_epiphany_cluster(v)
+    cluster = _process_cluster(v)
 
-    virtual_machines, epiphany_cluster = _process_virtual_machines(v, epiphany_cluster)
+    machines, cluster = _process_machines(v, cluster)
 
-    components = _process_components(v, epiphany_cluster)
+    components = _process_components(v, cluster)
 
     applications = _process_applications(v)
 
-    _output_data(v, [epiphany_cluster] + virtual_machines
-                                       + components
-                                       + [applications])
+    _output_data(v, [cluster] + machines
+                              + components
+                              + [applications])
     _update_state_file(v)

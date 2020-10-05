@@ -1,6 +1,5 @@
 import sys
 import subprocess
-
 from ._helpers import get_path, combine, load_yaml, dump_yaml, to_literal_scalar
 from .plan import _diff_module_configs
 
