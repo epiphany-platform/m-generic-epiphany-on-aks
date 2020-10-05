@@ -1,3 +1,5 @@
+"""Entrypoint for the "Classic Epiphany on AKS" module."""
+
 import os
 import sys
 import argparse

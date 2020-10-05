@@ -1,3 +1,5 @@
+"""Implementation of the "metadata" method."""
+
 import sys
 
 

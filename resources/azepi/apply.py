@@ -1,6 +1,7 @@
-import sys
+"""Implementation of the "apply" method."""
+
 import subprocess
-from ._helpers import get_path, combine, load_yaml, dump_yaml, to_literal_scalar
+from ._helpers import get_path, combine, load_yaml, dump_yaml
 from .plan import _diff_module_configs
 
 
@@ -28,9 +29,7 @@ def _run_epicli_apply(v):
             "--vault-password=" + "'asd'",
         ])
 
-        rc = subprocess.run(command, shell=True).returncode
-
-        return rc
+        subprocess.run(command, shell=True, check=True)
 
     finally:
         if v["epiphany_file"].exists():
@@ -83,8 +82,6 @@ def main(variables={}):
         print("no changes to apply")
         return
 
-    rc = _run_epicli_apply(v)
-    if rc != 0:
-        sys.exit(rc)
+    _run_epicli_apply(v)
 
     _update_state_file(v)

@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring,missing-function-docstring
+
 from azepi._helpers import load_yaml, dump_yaml_into_str
 
 

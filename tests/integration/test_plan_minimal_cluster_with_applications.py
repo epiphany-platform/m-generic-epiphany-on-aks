@@ -1,7 +1,9 @@
+# pylint: disable=missing-module-docstring,missing-function-docstring
+
 import sys
-import docker
 import pathlib
 import tempfile
+import docker
 
 
 DOCKER_IMAGE_NAME = "epiphanyplatform/azepi:latest"

@@ -1,3 +1,5 @@
+"""Common helper routines."""
+
 import io
 import sys
 import copy
@@ -87,8 +89,9 @@ def select(a_list, query, *, exactly=0):
     if counter >= exactly:
         if exactly == 1:
             return documents[0]
-        else:
-            return documents
+        return documents
+
+    return None
 
 
 def q_kind(kind):

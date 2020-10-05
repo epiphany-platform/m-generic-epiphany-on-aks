@@ -1,5 +1,8 @@
+"""Implementation of the "init" method."""
+
 import sys
-from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml, dump_yaml_into_str, to_literal_scalar
+from ._helpers import (get_path, combine, dictify, undictify,
+                       load_yaml, dump_yaml, dump_yaml_into_str, to_literal_scalar)
 
 
 # The standard "minimal-cluster-config.yml" is not used here because
@@ -71,7 +74,7 @@ def _get_enabled_components(cluster):
     return enabled_components
 
 
-def _get_dummy_machines(v, count):
+def _get_dummy_machines(_, count):
     machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
     return [
