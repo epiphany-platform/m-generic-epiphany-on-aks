@@ -141,7 +141,9 @@ def test_init_minimal_cluster_with_applications():
 
     yaml = ruamel.yaml.YAML(typ="safe")
 
-    documents = list(yaml.load_all(stdout))
+    module_config = yaml.load(stdout)
+
+    documents = list(yaml.load_all(module_config["azepi"]["config"]))
 
     assert _check_flag_k8s_as_cloud_service(documents)
 

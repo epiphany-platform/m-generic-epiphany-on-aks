@@ -1,7 +1,7 @@
 import io
 import sys
 
-from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml
+from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml, to_literal_scalar
 
 
 # The standard "minimal-cluster-config.yml" is not used here because
@@ -46,6 +46,12 @@ INITIAL_MODULE_STATE = '''
 kind: state
 {M_MODULE_SHORT}:
   status: initialized
+'''
+
+INITIAL_MODULE_CONFIG = '''
+kind: {M_MODULE_SHORT}-config
+{M_MODULE_SHORT}:
+  config: |
 '''
 
 
@@ -237,10 +243,18 @@ def _output_data(v, documents):
     if v["config_file"].exists():
         v["config_file"].rename(v["backup_file"])
 
-    with v["config_file"].open("w") as stream:
-        stream.write(stdout)
+    config = load_yaml(INITIAL_MODULE_CONFIG.format(**v).strip())
 
-    print(stdout, file=sys.stdout)
+    config = combine(config, {
+        v["M_MODULE_SHORT"]: {
+            "config": to_literal_scalar(stdout),
+        },
+    })
+
+    with v["config_file"].open("w") as stream:
+        dump_yaml(config, stream=stream)
+
+    dump_yaml(config, stream=sys.stdout)
 
 
 def main(variables={}):

@@ -13,18 +13,27 @@ kind: state
 '''
 
 
-def _run_epicli_apply(_):
-    command = " ".join([
-        "epicli",
-        "--auto-approve",
-        "apply",
-        "--file=/shared/azepi/azepi-config.yml",
-        "--vault-password='asd'",
-    ])
+def _run_epicli_apply(v):
+    try:
+        config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
 
-    rc = subprocess.run(command, shell=True).returncode
+        with v["epiphany_file"].open("w") as stream:
+            stream.write(config)
 
-    return rc
+        command = " ".join([
+            "epicli",
+            "--auto-approve",
+            "apply",
+            "--file=" + str(v["epiphany_file"]),
+            "--vault-password=" + "'asd'",
+        ])
+
+        rc = subprocess.run(command, shell=True).returncode
+
+        return rc
+
+    finally:
+        v["epiphany_file"].unlink(missing_ok=True)
 
 
 def _update_state_file(v):
@@ -32,8 +41,7 @@ def _update_state_file(v):
 
     state = combine(state, load_yaml(FINAL_MODULE_STATE.format(**v).strip()))
 
-    with v["config_file"].open("r") as stream:
-        config = stream.read()
+    config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
 
     state = combine(state, {
         v["M_MODULE_SHORT"]: {
@@ -54,6 +62,7 @@ def main(variables={}):
     v["module_dir"] = get_path(str(v["shared_dir"] / v["M_MODULE_SHORT"]))
     v["config_file"] = get_path(str(v["module_dir"] / v["M_CONFIG_NAME"]))
     v["state_file"] = get_path(str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
+    v["epiphany_file"] = get_path(str(v["module_dir"] / "epiphany-config.yml")).resolve()
 
     # Create plan file required for apply method
     with (v["module_dir"] / "plan.diff").open("r") as stream:

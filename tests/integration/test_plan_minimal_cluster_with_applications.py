@@ -87,56 +87,59 @@ azepi:
 '''
 
 MODULE_CONFIG_MOCK = '''
-kind: epiphany-cluster
-title: Epiphany cluster Config
-name: azepi
-provider: any
-specification:
-  name: azepi
-  admin_user:
-    name: operations
-    key_path: /shared/vms_rsa
-  cloud:
-    k8s_as_cloud_service: true
-  components:
-    repository:
-      count: 1
-      machines:
-        - default-azbi-1
-    kubernetes_master:
-      count: 0
-    kubernetes_node:
-      count: 0
-    logging:
-      count: 0
-    monitoring:
-      count: 0
-    kafka:
-      count: 0
-    postgresql:
-      count: 1
-      machines:
-        - default-azbi-2
-    load_balancer:
-      count: 0
-    rabbitmq:
-      count: 0
----
-kind: infrastructure/machine
-title: "Virtual Machine Infra"
-provider: any
-name: default-azbi-1
-specification:
-  ip: 10.0.1.4
-  hostname: azbi-1
----
-kind: infrastructure/machine
-title: "Virtual Machine Infra"
-provider: any
-name: default-azbi-2
-specification:
-  ip: 10.0.1.86
-  hostname: azbi-2
+kind: azepi-config
+azepi:
+  config: |
+    kind: epiphany-cluster
+    title: Epiphany cluster Config
+    name: azepi
+    provider: any
+    specification:
+      name: azepi
+      admin_user:
+        name: operations
+        key_path: /shared/vms_rsa
+      cloud:
+        k8s_as_cloud_service: true
+      components:
+        repository:
+          count: 1
+          machines:
+            - default-azbi-1
+        kubernetes_master:
+          count: 0
+        kubernetes_node:
+          count: 0
+        logging:
+          count: 0
+        monitoring:
+          count: 0
+        kafka:
+          count: 0
+        postgresql:
+          count: 1
+          machines:
+            - default-azbi-2
+        load_balancer:
+          count: 0
+        rabbitmq:
+          count: 0
+    ---
+    kind: infrastructure/machine
+    title: "Virtual Machine Infra"
+    provider: any
+    name: default-azbi-1
+    specification:
+      ip: 10.0.1.4
+      hostname: azbi-1
+    ---
+    kind: infrastructure/machine
+    title: "Virtual Machine Infra"
+    provider: any
+    name: default-azbi-2
+    specification:
+      ip: 10.0.1.86
+      hostname: azbi-2
 '''
 
 EXPECTED_OUTPUT = b'''

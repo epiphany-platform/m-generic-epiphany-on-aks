@@ -20,8 +20,7 @@ def _extract_module_config(v):
 def _diff_module_configs(v, extracted_config):
     """Compute unified diff between module configs."""
 
-    with v["config_file"].open("r") as stream:
-        current_config = stream.read()
+    current_config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
 
     return udiff(extracted_config.strip(), current_config.strip()).strip()
 
@@ -44,4 +43,5 @@ def main(variables={}):
     with (v["module_dir"] / "plan.diff").open("w") as stream:
         stream.write(config_diff)
 
-    print(config_diff, file=sys.stdout)
+    if config_diff:
+        print(config_diff, file=sys.stdout)
