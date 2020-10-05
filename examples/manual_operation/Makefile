@@ -17,14 +17,14 @@ export
 
 all: metadata init
 
-.PHONY: metadata init plan apply destroy-plan destroy
+.PHONY: metadata init plan apply plan-destroy destroy
 
 metadata: setup
 	@$(call RUN_COMMAND,$@)
 
 init: setup
 	@$(call RUN_COMMAND,$@) \
-	VMS_RSA_FILENAME=$(VMS_RSA_FILENAME)
+		VMS_RSA_FILENAME=$(VMS_RSA_FILENAME)
 
 plan: setup
 	@$(call RUN_COMMAND,$@)
@@ -32,7 +32,7 @@ plan: setup
 apply: setup
 	@$(call RUN_COMMAND,$@)
 
-destroy-plan: setup
+plan-destroy: setup
 	@$(call RUN_COMMAND,$@)
 
 destroy: setup

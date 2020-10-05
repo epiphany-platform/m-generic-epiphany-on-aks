@@ -27,9 +27,9 @@ def _add_apply_parser(subparsers):
     parser.set_defaults(handler=azepi.apply.main)
 
 
-def _add_destroy_plan_parser(subparsers):
-    parser = subparsers.add_parser("destroy-plan")
-    parser.set_defaults(handler=azepi.destroy_plan.main)
+def _add_plan_destroy_parser(subparsers):
+    parser = subparsers.add_parser("plan-destroy")
+    parser.set_defaults(handler=azepi.plan_destroy.main)
 
 
 def _add_destroy_parser(subparsers):
@@ -47,7 +47,7 @@ def main():
     _add_init_parser(subparsers)
     _add_plan_parser(subparsers)
     _add_apply_parser(subparsers)
-    _add_destroy_plan_parser(subparsers)
+    _add_plan_destroy_parser(subparsers)
     _add_destroy_parser(subparsers)
 
     arguments = parser.parse_args()
