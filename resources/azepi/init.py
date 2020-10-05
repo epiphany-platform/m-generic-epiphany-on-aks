@@ -6,18 +6,17 @@ from ._helpers import (get_path, combine, dictify, undictify,
 
 
 # The standard "minimal-cluster-config.yml" is not used here because
-# it contains too many extra documents. The "null" and "[]" should be
-# replaced with correct values.
+# it contains too many extra documents
 MINIMAL_EPIPHANY_CLUSTER = '''
 kind: epiphany-cluster
 title: Epiphany cluster Config
-name: null
+name: TO_BE_SET
 provider: any
 specification:
-  name: null
+  name: TO_BE_SET
   admin_user:
     name: operations
-    key_path: null
+    key_path: TO_BE_SET
   cloud:
     k8s_as_cloud_service: true
   components:
@@ -41,6 +40,23 @@ specification:
       count: 0
     rabbitmq:
       count: 0
+'''
+
+# Extend feature mapping of repository to enable applications
+MINIMAL_FEATURE_MAPPING = '''
+kind: configuration/feature-mapping
+title: Feature mapping to roles
+name: TO_BE_SET
+provider: any
+specification:
+  roles_mapping:
+    repository:
+      - repository
+      - image-registry
+      - firewall
+      - filebeat
+      - node-exporter
+      - applications
 '''
 
 # Original one seems to be incorrect (05 Oct 2020)
@@ -102,6 +118,19 @@ def _process_cluster(v):
     })
 
     return cluster
+
+
+def _process_feature_mapping(v):
+    """Process feature mapping (enable applications)."""
+
+    mapping_template = load_yaml(MINIMAL_FEATURE_MAPPING)
+
+    mapping = combine(mapping_template, {
+        "name": v["M_MODULE_SHORT"],
+        "provider": "any",
+    })
+
+    return mapping
 
 
 def _process_machines(v, cluster):
@@ -294,13 +323,16 @@ def main(variables={}):
 
     cluster = _process_cluster(v)
 
+    mapping = _process_feature_mapping(v)
+
     machines, cluster = _process_machines(v, cluster)
 
     components = _process_components(v, cluster)
 
     applications = _process_applications(v)
 
-    _output_data(v, [cluster] + machines
+    _output_data(v, [cluster] + [mapping]
+                              + machines
                               + components
                               + [applications])
     _update_state_file(v)
