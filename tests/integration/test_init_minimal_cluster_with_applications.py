@@ -2,9 +2,8 @@ import sys
 import docker
 import pathlib
 import tempfile
-import ruamel.yaml
 
-from azepi._helpers import select, q_kind
+from azepi._helpers import select, q_kind, load_yaml
 
 
 DOCKER_IMAGE_NAME = "epiphanyplatform/azepi:latest"
@@ -148,11 +147,9 @@ def test_init_minimal_cluster_with_applications():
 
         print(stderr, file=sys.stderr)
 
-    yaml = ruamel.yaml.YAML(typ="safe")
+    module_config = load_yaml(stdout)
 
-    module_config = yaml.load(stdout)
-
-    documents = list(yaml.load_all(module_config["azepi"]["config"]))
+    documents = load_yaml(module_config["azepi"]["config"])
 
     assert _check_flag_k8s_as_cloud_service(documents)
 

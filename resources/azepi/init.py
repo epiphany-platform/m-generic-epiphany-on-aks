@@ -1,7 +1,6 @@
-import io
 import sys
 
-from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml, to_literal_scalar
+from ._helpers import get_path, combine, dictify, undictify, load_yaml, dump_yaml, dump_yaml_into_str, to_literal_scalar
 
 
 # The standard "minimal-cluster-config.yml" is not used here because
@@ -61,7 +60,6 @@ kind: state
 INITIAL_MODULE_CONFIG = '''
 kind: {M_MODULE_SHORT}-config
 {M_MODULE_SHORT}:
-  config: |
 '''
 
 
@@ -248,13 +246,6 @@ def _update_state_file(v):
 def _output_data(v, documents):
     """Save and display generated config."""
 
-    try:
-        stream = io.StringIO()
-        dump_yaml(documents, stream=stream)
-        stdout = stream.getvalue()
-    finally:
-        stream.close()
-
     v["module_dir"].mkdir(parents=True, exist_ok=True)
 
     if v["config_file"].exists():
@@ -262,9 +253,11 @@ def _output_data(v, documents):
 
     config = load_yaml(INITIAL_MODULE_CONFIG.format(**v).strip())
 
+    output = dump_yaml_into_str(documents)
+
     config = combine(config, {
         v["M_MODULE_SHORT"]: {
-            "config": to_literal_scalar(stdout),
+            "config": to_literal_scalar(output),
         },
     })
 

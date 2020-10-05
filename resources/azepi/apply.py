@@ -1,19 +1,20 @@
 import sys
 import subprocess
 
-from ._helpers import get_path, combine, load_yaml, dump_yaml, to_literal_scalar, udiff
-from .plan import _extract_module_config, _diff_module_configs
+from ._helpers import get_path, combine, load_yaml, dump_yaml, to_literal_scalar
+from .plan import _diff_module_configs
 
 
 FINAL_MODULE_STATE = '''
 kind: state
 {M_MODULE_SHORT}:
   status: applied
-  config: |
 '''
 
 
 def _run_epicli_apply(v):
+    """Deploy Epiphany."""
+
     try:
         config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
 
@@ -38,16 +39,16 @@ def _run_epicli_apply(v):
 
 
 def _update_state_file(v):
+    """Make sure state is up to date."""
+
+    config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
+
     state = load_yaml(v["state_file"])
 
     state = combine(state, load_yaml(FINAL_MODULE_STATE.format(**v).strip()))
 
-    config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
-
     state = combine(state, {
-        v["M_MODULE_SHORT"]: {
-            "config": to_literal_scalar(config),
-        },
+        v["M_MODULE_SHORT"]: config,
     })
 
     with v["state_file"].open("w") as stream:
@@ -69,9 +70,7 @@ def main(variables={}):
     with (v["module_dir"] / "plan.diff").open("r") as stream:
         plan_diff = stream.read()
 
-    extracted_config = _extract_module_config(v)
-
-    current_diff = _diff_module_configs(v, extracted_config)
+    current_diff = _diff_module_configs(v)
 
     if not (bool(plan_diff) and bool(current_diff) and plan_diff == current_diff):
         print("no changes to apply")

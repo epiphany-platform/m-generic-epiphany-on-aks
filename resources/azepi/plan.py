@@ -1,28 +1,24 @@
 import sys
-import pathlib
 
-from ._helpers import get_path, load_yaml, udiff
-
-
-def _extract_module_config(v):
-    """Extract module config."""
-
-    state = load_yaml(v["state_file"])
-
-    try:
-        config = state[v["M_MODULE_SHORT"]]["config"]
-    except KeyError:
-        config = ""
-
-    return config
+from ._helpers import get_path, load_yaml, dump_yaml_into_str, udiff
 
 
-def _diff_module_configs(v, extracted_config):
-    """Compute unified diff between module configs."""
+def _diff_module_configs(v):
+    """Compute unified diff between state and module config."""
 
-    current_config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
+    state = load_yaml(v["state_file"])[v["M_MODULE_SHORT"]]
 
-    return udiff(extracted_config.strip(), current_config.strip()).strip()
+    # Remove known keys that are not parts of the config
+    for key_to_remove in {"status", "output"}:
+        if key_to_remove in state:
+            del state[key_to_remove]
+
+    config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
+
+    return udiff(
+        dump_yaml_into_str(state).strip(),
+        dump_yaml_into_str(config).strip(),
+    ).strip()
 
 
 def main(variables={}):
@@ -35,9 +31,7 @@ def main(variables={}):
     v["config_file"] = get_path(str(v["module_dir"] / v["M_CONFIG_NAME"]))
     v["state_file"] = get_path(str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
 
-    extracted_config = _extract_module_config(v)
-
-    config_diff = _diff_module_configs(v, extracted_config)
+    config_diff = _diff_module_configs(v)
 
     # Create plan file required for apply method
     with (v["module_dir"] / "plan.diff").open("w") as stream:
