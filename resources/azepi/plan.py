@@ -1,6 +1,6 @@
 import sys
 
-from ._helpers import get_path, load_yaml, dump_yaml_into_str, udiff
+from ._helpers import get_path, load_yaml, dump_yaml_into_str, sorted_dict, udiff
 
 
 def _diff_module_configs(v):
@@ -16,8 +16,8 @@ def _diff_module_configs(v):
     config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
 
     return udiff(
-        dump_yaml_into_str(state).strip(),
-        dump_yaml_into_str(config).strip(),
+        dump_yaml_into_str(sorted_dict(state)).strip(),
+        dump_yaml_into_str(sorted_dict(config)).strip(),
     ).strip()
 
 
