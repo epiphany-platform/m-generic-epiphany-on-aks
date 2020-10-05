@@ -48,13 +48,16 @@ pipenv-lock:
 pipenv-sync:
 	pipenv sync --three --python=3.7 --dev
 
-.PHONY: lint format
+.PHONY: lint format diff
 
 lint:
 	cd $(ROOT_DIR)/ && pylint_runner --rcfile pylintrc
 
 format:
 	cd $(ROOT_DIR)/ && autopep8 --in-place --recursive ./resources/ ./tests/
+
+diff:
+	cd $(ROOT_DIR)/ && git diff
 
 .PHONY: test test-unit test-integration
 
