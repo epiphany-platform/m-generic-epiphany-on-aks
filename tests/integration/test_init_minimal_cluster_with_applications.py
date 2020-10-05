@@ -125,15 +125,17 @@ def test_init_minimal_cluster_with_applications():
         with (shared_dir / "state.yml").open("w") as stream:
             stream.write(STATE_FILE_MOCK)
 
-        container = client.containers.run(DOCKER_IMAGE_NAME,
-            auto_remove = False,
-            detach = True,
-            volumes = {
+        container = client.containers.run(
+            DOCKER_IMAGE_NAME,
+            auto_remove=False,
+            detach=True,
+            volumes={
                 str(shared_dir.resolve()): {"bind": "/shared/", "mode": "rw"},
             },
-            command = [
+            command=[
                 "init",
-                *map("=".join, VARIABLES.items()),  # create KEY=VALUE style parameters (makefile-like)
+                # Create KEY=VALUE style parameters (makefile-like)
+                *map("=".join, VARIABLES.items()),
             ],
         )
 

@@ -194,7 +194,8 @@ def _process_components(v, cluster):
 def _process_applications(v):
     """Process application defaults."""
 
-    applications_template = load_yaml(v["template_dir"] / "configuration" / "applications.yml")
+    applications_template = load_yaml(
+        v["template_dir"] / "configuration" / "applications.yml")
 
     # Add provider key
     applications_template = combine(applications_template, {
@@ -202,7 +203,8 @@ def _process_applications(v):
     })
 
     # Convert list-based dictionary to real one (makes merging possible)
-    applications = dictify(applications_template["specification"]["applications"])
+    applications = dictify(
+        applications_template["specification"]["applications"])
 
     # Make sure user gets defaults appropriate for cloud Kuberentes
     applications = combine(applications, {
@@ -215,7 +217,8 @@ def _process_applications(v):
 
     applications = combine(applications_template, {
         "specification": {
-            "applications": undictify(applications),  # convert-back to list-based dictionary
+            # convert-back to list-based dictionary
+            "applications": undictify(applications),
         },
     })
 
@@ -273,10 +276,18 @@ def main(variables={}):
     v = variables
     v["shared_dir"] = get_path(v["M_SHARED"])
     v["template_dir"] = get_path(v["M_TEMPLATES"])
-    v["module_dir"] = get_path(str(v["shared_dir"] / v["M_MODULE_SHORT"]))
-    v["config_file"] = get_path(str(v["module_dir"] / v["M_CONFIG_NAME"]))
-    v["backup_file"] = get_path(str(v["module_dir"] / (v["M_CONFIG_NAME"] + ".backup")))
-    v["state_file"] = get_path(str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
+
+    v["module_dir"] = get_path(
+        str(v["shared_dir"] / v["M_MODULE_SHORT"]))
+
+    v["config_file"] = get_path(
+        str(v["module_dir"] / v["M_CONFIG_NAME"]))
+
+    v["state_file"] = get_path(
+        str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
+
+    v["backup_file"] = get_path(
+        str(v["module_dir"] / (v["M_CONFIG_NAME"] + ".backup")))
 
     cluster = _process_cluster(v)
 

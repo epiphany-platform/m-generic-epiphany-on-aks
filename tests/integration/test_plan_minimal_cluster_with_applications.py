@@ -166,15 +166,17 @@ def test_plan_minimal_cluster_with_applications():
         with (module_dir / "azepi-config.yml").open("w") as stream:
             stream.write(MODULE_CONFIG_MOCK)
 
-        container = client.containers.run(DOCKER_IMAGE_NAME,
-            auto_remove = False,
-            detach = True,
-            volumes = {
+        container = client.containers.run(
+            DOCKER_IMAGE_NAME,
+            auto_remove=False,
+            detach=True,
+            volumes={
                 str(shared_dir.resolve()): {"bind": "/shared/", "mode": "rw"},
             },
-            command = [
+            command=[
                 "plan",
-                *map("=".join, VARIABLES.items()),  # create KEY=VALUE style parameters (makefile-like)
+                # Create KEY=VALUE style parameters (makefile-like)
+                *map("=".join, VARIABLES.items()),
             ],
         )
 

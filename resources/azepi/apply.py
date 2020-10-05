@@ -60,10 +60,18 @@ def main(variables={}):
     # Compute paths
     v = variables
     v["shared_dir"] = get_path(v["M_SHARED"])
-    v["module_dir"] = get_path(str(v["shared_dir"] / v["M_MODULE_SHORT"]))
-    v["config_file"] = get_path(str(v["module_dir"] / v["M_CONFIG_NAME"]))
-    v["state_file"] = get_path(str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
-    v["epiphany_file"] = get_path(str(v["module_dir"] / "epiphany-config.yml")).resolve()
+
+    v["module_dir"] = get_path(
+        str(v["shared_dir"] / v["M_MODULE_SHORT"]))
+
+    v["config_file"] = get_path(
+        str(v["module_dir"] / v["M_CONFIG_NAME"]))
+
+    v["state_file"] = get_path(
+        str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
+
+    v["epiphany_file"] = get_path(
+        str(v["module_dir"] / "epiphany-config.yml")).resolve()
 
     # Create plan file required for apply method
     with (v["module_dir"] / "plan.diff").open("r") as stream:
