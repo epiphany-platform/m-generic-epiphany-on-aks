@@ -48,15 +48,23 @@ pipenv-lock:
 pipenv-sync:
 	pipenv sync --three --python=3.7 --dev
 
+.PHONY: lint format
+
+lint:
+	cd $(ROOT_DIR)/ && pylint_runner --rcfile pylintrc
+
+format:
+	cd $(ROOT_DIR)/ && autopep8 --in-place --recursive ./resources/ ./tests/
+
 .PHONY: test test-unit test-integration
 
 test: test-unit test-integration
 
 test-unit:
-	PYTHONPATH=$(ROOT_DIR)/resources pytest -vv $(ROOT_DIR)/tests/unit/
+	cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/unit/
 
 test-integration: build
-	PYTHONPATH=$(ROOT_DIR)/resources pytest -vv $(ROOT_DIR)/tests/integration/
+	cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/integration/
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \
