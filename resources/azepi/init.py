@@ -42,6 +42,16 @@ specification:
       count: 0
 '''
 
+# Original one seems to be incorrect (05 Oct 2020)
+VIRTUAL_MACHINE_TEMPLATE = '''
+kind: infrastructure/machine
+name: TO_BE_SET
+provider: any
+specification:
+  hostname: TO_BE_SET
+  ip: TO_BE_SET
+'''
+
 INITIAL_MODULE_STATE = '''
 kind: state
 {M_MODULE_SHORT}:
@@ -65,7 +75,7 @@ def _get_enabled_components(epiphany_cluster):
 
 
 def _get_dummy_virtual_machines(v, count):
-    virtual_machine_template = load_yaml(v["template_dir"] / "infrastructure" / "machine.yml")
+    virtual_machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
     return [
         combine(virtual_machine_template, {
@@ -113,7 +123,7 @@ def _process_virtual_machines(v, epiphany_cluster):
         return vms
 
     def derive_virtual_machines(vms):
-        virtual_machine_template = load_yaml(v["template_dir"] / "infrastructure" / "machine.yml")
+        virtual_machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
         virtual_machines = [
             combine(virtual_machine_template, {
@@ -175,7 +185,9 @@ def _process_components(v, epiphany_cluster):
     """Process component defaults."""
 
     components = [
-        load_yaml(v["template_dir"] / "configuration" / (key + ".yml"))
+        combine(load_yaml(v["template_dir"] / "configuration" / (key + ".yml")), {
+            "provider": "any",
+        })
         for key, _ in _get_enabled_components(epiphany_cluster)
     ]
 
@@ -186,6 +198,11 @@ def _process_applications(v):
     """Process application defaults."""
 
     applications_template = load_yaml(v["template_dir"] / "configuration" / "applications.yml")
+
+    # Add provider key
+    applications_template = combine(applications_template, {
+        "provider": "any",
+    })
 
     # Convert list-based dictionary to real one (makes merging possible)
     applications = dictify(applications_template["specification"]["applications"])

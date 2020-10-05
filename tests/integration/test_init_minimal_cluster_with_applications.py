@@ -61,7 +61,7 @@ def _check_virtual_machines(documents):
                      exactly=1)
 
     machines = select(documents,
-                      q_kind("infrastructure/virtual-machine"))
+                      q_kind("infrastructure/machine"))
 
     machine_names = {
         item["name"]
@@ -104,6 +104,15 @@ def _check_flag_use_local_image_registry(documents):
     return all(
         item["use_local_image_registry"] is False
         for item in applications["specification"]["applications"]
+    )
+
+
+def _check_if_provider_is_defined(documents):
+    """Make sure "provider" is defined for all documents."""
+
+    return all(
+        "provider" in item and item["provider"] == "any"
+        for item in documents
     )
 
 
@@ -152,3 +161,5 @@ def test_init_minimal_cluster_with_applications():
     assert _check_components(documents)
 
     assert _check_flag_use_local_image_registry(documents)
+
+    assert _check_if_provider_is_defined(documents)
