@@ -158,6 +158,13 @@ def to_literal_scalar(a_str):
     return ruamel.yaml.scalarstring.LiteralScalarString(a_str)
 
 
+def sorted_dict(a_dict):
+    """Simple helper for sorting dictionaries."""
+    return dict(
+        sorted(a_dict.items()),
+    )
+
+
 def udiff(str_a, str_b, *, number_of_context_lines=0):
     """Compute unified diff of two strings."""
 
