@@ -265,12 +265,6 @@ def _update_state_file(v):
     except FileNotFoundError:
         state = {}
 
-    try:
-        # Make sure old state is completely deleted
-        del state[v["M_MODULE_SHORT"]]
-    except KeyError:
-        pass
-
     state = combine(state, load_yaml(INITIAL_MODULE_STATE.format(**v).strip()))
 
     with v["state_file"].open("w") as stream:
