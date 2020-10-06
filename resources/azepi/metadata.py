@@ -8,7 +8,7 @@ labels:
   version: {M_VERSION}
   name: Generic Epiphany on AKS
   short: {M_MODULE_SHORT}
-  kind: provisioner
+  kind: epiphany
   provider: azure
 '''
 
