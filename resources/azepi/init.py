@@ -78,6 +78,7 @@ kind: state
 INITIAL_MODULE_CONFIG = '''
 kind: {M_MODULE_SHORT}-config
 {M_MODULE_SHORT}:
+  vault_password: "asd"
 '''
 
 

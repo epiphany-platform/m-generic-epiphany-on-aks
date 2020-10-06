@@ -16,17 +16,19 @@ def _run_epicli_apply(v):
     """Deploy Epiphany."""
 
     try:
-        config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]["config"]
+        module_config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
+
+        epiphany_config = module_config["config"]
 
         with v["epiphany_file"].open("w") as stream:
-            stream.write(config)
+            stream.write(epiphany_config)
 
         command = " ".join([
             "epicli",
             "--auto-approve",
             "apply",
-            "--file=" + str(v["epiphany_file"]),
-            "--vault-password=" + "'asd'",
+            "--file='{}'".format(v["epiphany_file"]),
+            "--vault-password='{:s}'".format(module_config["vault_password"]),
         ])
 
         subprocess.run(command, shell=True, check=True)

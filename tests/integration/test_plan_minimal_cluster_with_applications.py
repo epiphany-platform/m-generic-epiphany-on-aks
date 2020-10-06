@@ -86,6 +86,7 @@ azepi:
     specification:
       ip: 10.0.1.5
       hostname: azbi-2
+  vault_password: "asd"
 '''
 
 MODULE_CONFIG_MOCK = '''
@@ -142,6 +143,7 @@ azepi:
     specification:
       ip: 10.0.1.86
       hostname: azbi-2
+  vault_password: "asd"
 '''
 
 EXPECTED_OUTPUT = b'''
