@@ -8,6 +8,8 @@ IMAGE := azepi
 IMAGE_NAME_NO_VERSION := $(USER)/$(IMAGE)
 IMAGE_NAME            := $(IMAGE_NAME_NO_VERSION):$(VERSION)
 
+LINTER_TARGETS := ./workdir/ ./resources/ ./tests/
+
 export
 
 #used for correctly setting shared folder permissions
@@ -22,7 +24,7 @@ all: build
 
 epicli: guard-IMAGE
 	@install -d $(CACHE_DIR)/epiphany/
-	cd $(CACHE_DIR)/epiphany/ && git clone --depth=1 --branch=develop https://github.com/epiphany-platform/epiphany.git . || ( \
+	cd $(CACHE_DIR)/epiphany/ && git clone --branch=develop https://github.com/epiphany-platform/epiphany.git . || ( \
 		git fetch origin develop \
 		&& git checkout develop \
 		&& git clean -df \
@@ -43,31 +45,31 @@ build: guard-VERSION guard-IMAGE guard-USER epicli
 .PHONY: pipenv-lock pipenv-sync
 
 pipenv-lock:
-	pipenv lock --three --python=3.7 --dev
+	@cd $(ROOT_DIR)/ && pipenv lock --three --python=3.7 --dev
 
 pipenv-sync:
-	pipenv sync --three --python=3.7 --dev
+	@cd $(ROOT_DIR)/ && pipenv sync --three --python=3.7 --dev
 
 .PHONY: lint format diff
 
 lint:
-	cd $(ROOT_DIR)/ && pylint_runner --rcfile pylintrc
+	@cd $(ROOT_DIR)/ && find $(LINTER_TARGETS) -type f -name '*.py' | xargs pylint --output-format=colorized
 
 format:
-	cd $(ROOT_DIR)/ && autopep8 --in-place --recursive ./resources/ ./tests/
+	@cd $(ROOT_DIR)/ && autopep8 --in-place --recursive $(LINTER_TARGETS)
 
 diff:
-	cd $(ROOT_DIR)/ && git diff
+	@cd $(ROOT_DIR)/ && git diff
 
 .PHONY: test test-unit test-integration
 
 test: test-unit test-integration
 
 test-unit:
-	cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/unit/
+	@cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/unit/
 
 test-integration: build
-	cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/integration/
+	@cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/integration/
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \

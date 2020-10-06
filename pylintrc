@@ -1,6 +1,3 @@
-[MASTER]
-ignore=.cache,shared,examples
-
 [MESSAGE CONTROL]
 disable=duplicate-code,
         dangerous-default-value,
