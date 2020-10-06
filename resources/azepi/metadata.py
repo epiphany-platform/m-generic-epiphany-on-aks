@@ -6,9 +6,9 @@ import sys
 METADATA_CONTENT = '''
 labels:
   version: {M_VERSION}
-  name: Classic Epiphany on AKS
+  name: Generic Epiphany on AKS
   short: {M_MODULE_SHORT}
-  kind: infrastructure
+  kind: provisioner
   provider: azure
 '''
 
