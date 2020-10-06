@@ -90,7 +90,7 @@ def _get_enabled_components(cluster):
     return enabled_components
 
 
-def _get_dummy_machines(_, count):
+def _get_dummy_machines(count):
     machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
 
     return [
@@ -203,7 +203,8 @@ def _process_machines(v, cluster):
     except (FileNotFoundError, KeyError):
         # Fallback to dummy values if there is no state to read
         vms = []
-        machines = _get_dummy_machines(v, 4)
+        # "2" is in sync with the INITIAL_MODULE_CONFIG
+        machines = _get_dummy_machines(2)
 
     cluster = assign_machines_to_components(machines, cluster)
 
