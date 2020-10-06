@@ -88,8 +88,7 @@ plan-azks: setup
 	@$(call RUN_AZKS,plan)
 
 apply-azks: setup
-	@$(call RUN_AZKS,apply) \
-		kubeconfig
+	@$(call RUN_AZKS,apply)
 
 output-azks: setup
 	@$(call RUN_AZKS,output)
@@ -105,8 +104,6 @@ destroy-azks: setup
 init-azepi: setup
 	@$(call RUN_AZEPI,init) \
 		VMS_RSA_FILENAME=$(VMS_RSA_FILENAME)
-	@install -d $(ROOT_DIR)/shared/build/azepi/
-	@cp $(ROOT_DIR)/shared/kubeconfig $(ROOT_DIR)/shared/build/azepi/
 
 plan-azepi: setup
 	@$(call RUN_AZEPI,plan)

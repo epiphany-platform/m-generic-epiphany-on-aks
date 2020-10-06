@@ -12,6 +12,17 @@ kind: state
 '''
 
 
+def _extract_kubeconfig(v):
+    """Extract kubeconfig from state and save it in a file."""
+
+    kubeconfig = load_yaml(v["state_file"])["azks"]["output"]["kubeconfig.value"]
+
+    v["kubeconfig_file"].parent.mkdir(parents=True, exist_ok=True)
+
+    with v["kubeconfig_file"].open("w") as stream:
+        stream.write(kubeconfig)
+
+
 def _run_epicli_apply(v):
     """Deploy Epiphany."""
 
@@ -72,7 +83,10 @@ def main(variables={}):
         str(v["shared_dir"] / v["M_STATE_FILE_NAME"]))
 
     v["epiphany_file"] = get_path(
-        str(v["module_dir"] / "epiphany-config.yml")).resolve()
+        str(v["module_dir"] / "epiphany-config.yml"))
+
+    v["kubeconfig_file"] = get_path(
+        str(v["shared_dir"] / "build" / v["M_MODULE_SHORT"] / "kubeconfig"))
 
     # Create plan file required for apply method
     with (v["module_dir"] / "plan.diff").open("r") as stream:
@@ -83,6 +97,8 @@ def main(variables={}):
     if not (bool(plan_diff) and bool(current_diff) and plan_diff == current_diff):
         print("no changes to apply")
         return
+
+    _extract_kubeconfig(v)
 
     _run_epicli_apply(v)
 
