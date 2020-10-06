@@ -8,33 +8,14 @@ import difflib
 import ruamel.yaml
 
 
-def memoize(function):
-    """Simple memoize implementation (single str argument)."""
-
-    def _memoize(a_str):
-        if not hasattr(_memoize, "memo"):
-            setattr(_memoize, "memo", {})
-
-        memo = getattr(_memoize, "memo")
-
-        if a_str not in memo:
-            memo[a_str] = function(a_str)
-
-        return memo[a_str]
-
-    return _memoize
-
-
-@memoize
 def get_path(a_str):
-    """Create and return Path (memoized)."""
+    """Create and return resolved Path from a string."""
     return pathlib.Path(a_str).resolve()
 
 
 def combine(to_merge, extend_by):
     """Merge nested dictionaries."""
 
-    # Implementation taken from Epiphany's helpers
     def _combine(to_merge, extend_by):
         for key, value in extend_by.items():
             if key in to_merge:
@@ -54,6 +35,7 @@ def combine(to_merge, extend_by):
 
 def dictify(a_list, *, key_name="name"):
     """Convert a list-based dictionary to a dictionary."""
+    # Please note the "name" key is preserved in the list
     return {
         item[key_name]: item
         for item in copy.deepcopy(a_list)
@@ -62,7 +44,6 @@ def dictify(a_list, *, key_name="name"):
 
 def undictify(a_dict, *, key_name="name"):
     """Convert a dictionary to a list-based dictionary."""
-    # Please note the "name" key is not removed
     return [
         combine(value, {key_name: key})
         for key, value in copy.deepcopy(a_dict).items()
@@ -95,7 +76,7 @@ def select(a_list, query, *, exactly=0):
 
 
 def q_kind(kind):
-    """Retun simple kind query."""
+    """Return a simple "kind" query."""
     return lambda item: item["kind"] == kind
 
 
