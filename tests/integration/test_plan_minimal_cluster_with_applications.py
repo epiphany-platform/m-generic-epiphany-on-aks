@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring
+"""Integration testing of the "plan" lifecycle phase."""
 
 import sys
 import pathlib

@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring
+"""Unit testing of the "load_yaml" function."""
 
 from azepi._helpers import load_yaml, dump_yaml_into_str
 
@@ -64,6 +64,8 @@ OUTPUT3 = [
 
 
 def test_load_yaml_with_single_document():
+    """Unit test for the "load_yaml" function (single document)."""
+
     assert load_yaml(INPUT1) == OUTPUT1
 
     dumped = dump_yaml_into_str(load_yaml(INPUT1))
@@ -72,4 +74,6 @@ def test_load_yaml_with_single_document():
 
 
 def test_load_yaml_with_multiple_documents():
+    """Unit test for the "load_yaml" function (multiple documents)."""
+
     assert load_yaml(INPUT2) == OUTPUT3

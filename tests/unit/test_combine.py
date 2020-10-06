@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring
+"""Unit testing of the "combine" function."""
 
 from azepi._helpers import combine
 
@@ -40,4 +40,6 @@ OUTPUT = {
 
 
 def test_combine():
+    """Unit test for the "combine" function."""
+
     assert combine(INPUT, UPDATE) == OUTPUT

@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring
+"""Unit testing of the "udiff" function."""
 
 from azepi._helpers import udiff
 
@@ -47,4 +47,6 @@ OUTPUT = '''
 
 
 def test_udiff():
+    """Unit test for the "udiff" function."""
+
     assert udiff(INPUT1, INPUT2).strip() == OUTPUT.strip()

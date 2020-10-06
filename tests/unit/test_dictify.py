@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring
+"""Unit testing of the "dictify" function."""
 
 from azepi._helpers import dictify
 
@@ -27,4 +27,6 @@ OUTPUT = {
 
 
 def test_dictify():
+    """Unit test for the "dictify" function."""
+
     assert dictify(INPUT) == OUTPUT
