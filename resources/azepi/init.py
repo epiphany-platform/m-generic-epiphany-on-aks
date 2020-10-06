@@ -59,7 +59,8 @@ specification:
       - applications
 '''
 
-# Original one seems to be incorrect (05 Oct 2020)
+# Original one seems to be incorrect:
+# https://github.com/epiphany-platform/epiphany/issues/1743
 VIRTUAL_MACHINE_TEMPLATE = '''
 kind: infrastructure/machine
 name: TO_BE_SET
