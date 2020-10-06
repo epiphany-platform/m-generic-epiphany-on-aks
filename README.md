@@ -55,6 +55,8 @@ make format lint diff
 
 ### Deploy the basic\_flow example
 
+__Please make sure that you have latest azbi and azks images (build them) in your local docker daemon.__
+
 In `examples/basic_flow` directory run (in order):
 
 Prepare service principal config (use previously obtained values):
