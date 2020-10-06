@@ -226,17 +226,17 @@ def _process_components(v, cluster):
 def _process_applications(v):
     """Process application defaults."""
 
-    applications_template = load_yaml(
+    template = load_yaml(
         v["template_dir"] / "configuration" / "applications.yml")
 
     # Add provider key
-    applications_template = combine(applications_template, {
+    document = combine(template, {
         "provider": "any",
     })
 
     # Convert list-based dictionary to real one (makes merging possible)
     applications = dictify(
-        applications_template["specification"]["applications"])
+        document["specification"]["applications"])
 
     # Make sure user gets defaults appropriate for cloud Kuberentes
     applications = combine(applications, {
@@ -247,14 +247,14 @@ def _process_applications(v):
         if "use_local_image_registry" in value
     })
 
-    applications = combine(applications_template, {
+    document = combine(document, {
         "specification": {
-            # convert-back to list-based dictionary
+            # Convert-back to list-based dictionary
             "applications": undictify(applications),
         },
     })
 
-    return applications
+    return document
 
 
 def _update_state_file(v):
