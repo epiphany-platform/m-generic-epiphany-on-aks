@@ -53,7 +53,7 @@ def _check_flag_k8s_as_cloud_service(documents):
     return cluster["specification"]["cloud"]["k8s_as_cloud_service"] is True
 
 
-def _check_virtual_machines(documents):
+def _check_virtual_machine_assignments(documents):
     """Make sure each component gets all required vms."""
 
     cluster = select(documents,
@@ -78,7 +78,7 @@ def _check_virtual_machines(documents):
     )
 
 
-def _check_components(documents):
+def _check_if_component_configs_are_present(documents):
     """Make sure each enabled component has correspoding document attached."""
 
     cluster = select(documents,
@@ -156,9 +156,9 @@ def test_init_minimal_cluster_with_applications():
 
     assert _check_flag_k8s_as_cloud_service(documents)
 
-    assert _check_virtual_machines(documents)
+    assert _check_virtual_machine_assignments(documents)
 
-    assert _check_components(documents)
+    assert _check_if_component_configs_are_present(documents)
 
     assert _check_flag_use_local_image_registry(documents)
 
