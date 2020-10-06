@@ -84,19 +84,25 @@ kind: {M_MODULE_SHORT}-config
 
 
 def _get_enabled_components(cluster):
-    enabled_components = [
+    """Get all components with non-zero "count"."""
+
+    return [
         (key, value)
         for key, value in cluster["specification"]["components"].items()
         if int(value["count"]) > 0
     ]
-    return enabled_components
 
 
-def _get_dummy_machines(count):
-    machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
+def _get_dummy_machines(cluster):
+    """Generate dummy virtual machine documents."""
+
+    count = sum(
+        value["count"]
+        for _, value in _get_enabled_components(cluster)
+    )
 
     return [
-        combine(machine_template, {
+        combine(load_yaml(VIRTUAL_MACHINE_TEMPLATE), {
             "name": "default-vm-" + str(index + 1),
         })
         for index in range(count)
@@ -106,9 +112,7 @@ def _get_dummy_machines(count):
 def _process_cluster(v):
     """Process the main cluster document."""
 
-    cluster_template = load_yaml(MINIMAL_EPIPHANY_CLUSTER)
-
-    cluster = combine(cluster_template, {
+    return combine(load_yaml(MINIMAL_EPIPHANY_CLUSTER), {
         "name": v["M_MODULE_SHORT"],
         "provider": "any",
         "specification": {
@@ -119,20 +123,14 @@ def _process_cluster(v):
         },
     })
 
-    return cluster
-
 
 def _process_feature_mapping(v):
     """Process feature mapping (enable applications)."""
 
-    mapping_template = load_yaml(MINIMAL_FEATURE_MAPPING)
-
-    mapping = combine(mapping_template, {
+    return combine(load_yaml(MINIMAL_FEATURE_MAPPING), {
         "name": v["M_MODULE_SHORT"],
         "provider": "any",
     })
-
-    return mapping
 
 
 def _process_machines(v, cluster):
@@ -149,15 +147,11 @@ def _process_machines(v, cluster):
         else:
             vm_ips = output["private_ips.value"]
 
-        vms = zip(vm_names, vm_ips)
-
-        return vms
+        return zip(vm_names, vm_ips)
 
     def derive_machines(vms):
-        machine_template = load_yaml(VIRTUAL_MACHINE_TEMPLATE)
-
-        machines = [
-            combine(machine_template, {
+        return [
+            combine(load_yaml(VIRTUAL_MACHINE_TEMPLATE), {
                 "name": "default-" + vm_name,
                 "provider": "any",
                 "specification": {
@@ -167,8 +161,6 @@ def _process_machines(v, cluster):
             })
             for vm_name, vm_ip in vms
         ]
-
-        return machines
 
     def assign_machines_to_components(machines, cluster):
         number_of_required_vms = sum(
@@ -182,7 +174,7 @@ def _process_machines(v, cluster):
         # Convert virtual machine list to iterator
         machines = iter(machines)
 
-        cluster = combine(cluster, {
+        return combine(cluster, {
             "specification": {
                 "components": {
                     key: {
@@ -196,8 +188,6 @@ def _process_machines(v, cluster):
             },
         })
 
-        return cluster
-
     try:
         # Read data from the state file
         vms = read_vms_from_state_file()
@@ -205,8 +195,7 @@ def _process_machines(v, cluster):
     except (FileNotFoundError, KeyError):
         # Fallback to dummy values if there is no state to read
         vms = []
-        # "2" is in sync with the INITIAL_MODULE_CONFIG
-        machines = _get_dummy_machines(2)
+        machines = _get_dummy_machines(cluster)
 
     cluster = assign_machines_to_components(machines, cluster)
 
@@ -216,14 +205,12 @@ def _process_machines(v, cluster):
 def _process_components(v, cluster):
     """Process component defaults."""
 
-    components = [
+    return [
         combine(load_yaml(v["template_dir"] / "configuration" / (key + ".yml")), {
             "provider": "any",
         })
         for key, _ in _get_enabled_components(cluster)
     ]
-
-    return components
 
 
 def _process_applications(v):
@@ -250,14 +237,12 @@ def _process_applications(v):
         if "use_local_image_registry" in value
     })
 
-    document = combine(document, {
+    return combine(document, {
         "specification": {
             # Convert-back to list-based dictionary
             "applications": undictify(applications),
         },
     })
-
-    return document
 
 
 def _update_state_file(v):
