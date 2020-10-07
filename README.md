@@ -15,6 +15,8 @@ az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPT
 
 # Pull official epicli base image
 
+In main directory run:
+
 ```shell
 make epicli-pull
 ```
