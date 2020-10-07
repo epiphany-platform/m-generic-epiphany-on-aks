@@ -12,7 +12,7 @@ IMAGE_NAME := $(USER)/$(IMAGE)
 
 # Used for correctly setting user permissions
 HOST_UID := $(shell id -u)
-HOST_GID := $(word 3,$(subst :, ,$(shell getent group docker)))
+HOST_GID := $(lastword $(shell stat -f "%g" /var/run/docker.sock 2>/dev/null || stat -c "%g" /var/run/docker.sock 2>/dev/null))
 
 define DOCKER_BUILD
 docker build \
