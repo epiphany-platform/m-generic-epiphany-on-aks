@@ -128,7 +128,8 @@ def test_init_minimal_cluster_with_applications():
         with (shared_dir / "state.yml").open("w") as stream:
             stream.write(STATE_FILE_MOCK)
 
-        external_cache_dir = pathlib.Path(os.getenv("CACHE_DIR", "/shared")).resolve()
+        external_cache_dir = pathlib.Path(
+            os.getenv("CACHE_DIR", "/shared")).resolve()
 
         container = client.containers.run(
             DOCKER_IMAGE_NAME,

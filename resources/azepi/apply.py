@@ -15,7 +15,9 @@ kind: state
 def _extract_kubeconfig(v):
     """Extract kubeconfig from state and save it in a file."""
 
-    kubeconfig = load_yaml(v["state_file"])["azks"]["output"]["kubeconfig.value"]
+    state = load_yaml(v["state_file"])
+
+    kubeconfig = state["azks"]["output"]["kubeconfig.value"]
 
     v["kubeconfig_file"].parent.mkdir(parents=True, exist_ok=True)
 

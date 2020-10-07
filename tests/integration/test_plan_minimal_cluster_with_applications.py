@@ -171,7 +171,8 @@ def test_plan_minimal_cluster_with_applications():
         with (module_dir / "azepi-config.yml").open("w") as stream:
             stream.write(MODULE_CONFIG_MOCK)
 
-        external_cache_dir = pathlib.Path(os.getenv("CACHE_DIR", "/shared")).resolve()
+        external_cache_dir = pathlib.Path(
+            os.getenv("CACHE_DIR", "/shared")).resolve()
 
         container = client.containers.run(
             DOCKER_IMAGE_NAME,
