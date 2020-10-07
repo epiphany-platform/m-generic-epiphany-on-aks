@@ -22,7 +22,6 @@ specification:
   components:
     repository:
       count: 1
-      machines: []
     kubernetes_master:
       count: 0
     kubernetes_node:
@@ -35,7 +34,6 @@ specification:
       count: 0
     postgresql:
       count: 1
-      machines: []
     load_balancer:
       count: 0
     rabbitmq:
