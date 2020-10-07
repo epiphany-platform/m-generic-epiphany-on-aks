@@ -1,5 +1,6 @@
 """Integration testing of the "init" lifecycle phase."""
 
+import os
 import sys
 import pathlib
 import tempfile
@@ -7,7 +8,7 @@ import docker
 from azepi._helpers import select, q_kind, load_yaml
 
 
-DOCKER_IMAGE_NAME = "epiphanyplatform/azepi:latest"
+DOCKER_IMAGE_NAME = "epiphanyplatform/azepi:stage3"
 
 VARIABLES = {
     "VMS_RSA_FILENAME": "vms_rsa",
@@ -121,18 +122,27 @@ def test_init_minimal_cluster_with_applications():
 
     client = docker.from_env()
 
-    with tempfile.TemporaryDirectory() as shared_dir_name:
+    with tempfile.TemporaryDirectory(dir="/shared/") as shared_dir_name:
         shared_dir = pathlib.Path(shared_dir_name)
 
         with (shared_dir / "state.yml").open("w") as stream:
             stream.write(STATE_FILE_MOCK)
+
+        external_cache_dir = pathlib.Path(os.getenv("CACHE_DIR", "/shared")).resolve()
 
         container = client.containers.run(
             DOCKER_IMAGE_NAME,
             auto_remove=False,
             detach=True,
             volumes={
-                str(shared_dir.resolve()): {"bind": "/shared/", "mode": "rw"},
+                "/var/run/docker.sock": {
+                    "bind": "/var/run/docker.sock",
+                    "mode": "rw",
+                },
+                str(external_cache_dir / "shared" / shared_dir.name): {
+                    "bind": "/shared/",
+                    "mode": "rw",
+                },
             },
             command=[
                 "init",

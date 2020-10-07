@@ -5,16 +5,28 @@ VERSION ?= 0.0.1
 USER := epiphanyplatform
 IMAGE := azepi
 
-IMAGE_NAME_NO_VERSION := $(USER)/$(IMAGE)
-IMAGE_NAME            := $(IMAGE_NAME_NO_VERSION):$(VERSION)
-
-LINTER_TARGETS := ./workdir/ ./resources/ ./tests/
-
 export
 
-#used for correctly setting shared folder permissions
+IMAGE_NAME := $(USER)/$(IMAGE)
+
+# Used for correctly setting user permissions
 HOST_UID := $(shell id -u)
-HOST_GID := $(shell id -g)
+HOST_GID := $(word 3,$(subst :, ,$(shell getent group docker)))
+
+define DOCKER_BUILD
+docker build \
+	--build-arg ARG_BASE_IMAGE=epicli-$(IMAGE)-develop \
+	--build-arg ARG_M_VERSION=$(VERSION) \
+	--build-arg ARG_HOST_UID=$(HOST_UID) \
+	--build-arg ARG_HOST_GID=$(HOST_GID) \
+	--target $(1) \
+	$(if $(2),--cache-from $(IMAGE_NAME):$(2)) \
+	$(if $(3),--cache-from $(IMAGE_NAME):$(3)) \
+	$(if $(4),--cache-from $(IMAGE_NAME):$(4)) \
+	$(if $(5),--cache-from $(IMAGE_NAME):$(5)) \
+	--tag $(IMAGE_NAME):$(1) \
+	.
+endef
 
 .PHONY: all
 
@@ -33,14 +45,11 @@ epicli: guard-IMAGE
 	cd $(CACHE_DIR)/epiphany/ && docker build -t epicli-$(IMAGE)-develop .
 
 build: guard-VERSION guard-IMAGE guard-USER epicli
-	docker build \
-		--build-arg ARG_BASE_IMAGE=epicli-$(IMAGE)-develop \
-		--build-arg ARG_M_VERSION=$(VERSION) \
-		--build-arg ARG_HOST_UID=$(HOST_UID) \
-		--build-arg ARG_HOST_GID=$(HOST_GID) \
-		-t $(IMAGE_NAME) \
-		.
-	docker tag $(IMAGE_NAME) $(IMAGE_NAME_NO_VERSION):latest
+	$(call DOCKER_BUILD,stage0,stage0)
+	$(call DOCKER_BUILD,stage1,stage0,stage1)
+	$(call DOCKER_BUILD,stage2,stage0,stage1,stage2)
+	$(call DOCKER_BUILD,stage3,stage0,stage1,stage2,stage3)
+	docker tag $(IMAGE_NAME):stage3 $(IMAGE_NAME):$(VERSION)
 
 .PHONY: pipenv-lock pipenv-sync
 
@@ -50,26 +59,22 @@ pipenv-lock:
 pipenv-sync:
 	@cd $(ROOT_DIR)/ && pipenv sync --three --python=3.7 --dev
 
-.PHONY: lint format diff
-
-lint:
-	@cd $(ROOT_DIR)/ && find $(LINTER_TARGETS) -type f -name '*.py' | xargs pylint --output-format=colorized
+.PHONY: format
 
 format:
-	@cd $(ROOT_DIR)/ && autopep8 --in-place --recursive $(LINTER_TARGETS)
+	@cd $(ROOT_DIR)/ && autopep8 --in-place --recursive ./workdir/ ./resources/ ./tests/ \
+	                 && git diff
 
-diff:
-	@cd $(ROOT_DIR)/ && git diff
+.PHONY: test
 
-.PHONY: test test-unit test-integration
-
-test: test-unit test-integration
-
-test-unit:
-	@cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/unit/
-
-test-integration: build
-	@cd $(ROOT_DIR)/ && PYTHONPATH=$(ROOT_DIR)/resources pytest -vv ./tests/integration/
+test: build
+	@rm -rf $(CACHE_DIR)/shared/ && install -d $(CACHE_DIR)/shared/
+	@docker run --rm \
+		-e CACHE_DIR \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(CACHE_DIR)/shared/:/shared/ \
+		-t $(IMAGE_NAME):stage2 \
+	    pytest -vv /tests/integration/
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \
