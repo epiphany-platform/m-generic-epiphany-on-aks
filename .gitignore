@@ -1,8 +1,8 @@
-*.swp
-*.swo
-*.zip
-*.pyc
-__pycache__/
+**/*.swp
+**/*.swo
+**/*.zip
+**/*.pyc
+**/__pycache__/
 /.vscode/
 /.idea/
 /.cache/
