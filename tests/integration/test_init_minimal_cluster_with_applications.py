@@ -135,7 +135,8 @@ def test_init_minimal_cluster_with_applications():
         os.system("chmod ugo+rw /var/run/docker.sock")
 
         # Fix access rights so the image in test can read shared data
-        os.system("chown -R {HOST_UID}:{HOST_GID} /shared/".format(**os.environ))
+        os.system(
+            "chown -R {HOST_UID}:{HOST_GID} /shared/".format(**os.environ))
 
         container = client.containers.run(
             DOCKER_IMAGE_NAME,
