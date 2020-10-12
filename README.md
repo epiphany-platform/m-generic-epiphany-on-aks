@@ -69,3 +69,25 @@ make plan-destroy-azks destroy-azks
 ```shell
 make plan-destroy-azbi destroy-azbi
 ```
+
+# For Developers
+
+To install required pip packages into local environment (virtualenv):
+```shell
+$ make pipenv-sync
+```
+
+To update Pipfile.lock with latest packages:
+```shell
+$ make pipenv-lock
+```
+
+To automatically re-format all the python code to PEP8:
+```shell
+$ make format
+```
+
+To run integration tests:
+```shell
+$ make test
+```
