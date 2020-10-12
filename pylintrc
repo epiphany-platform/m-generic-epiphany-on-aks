@@ -1,0 +1,4 @@
+[MESSAGE CONTROL]
+disable=duplicate-code,
+        dangerous-default-value,
+        invalid-name
