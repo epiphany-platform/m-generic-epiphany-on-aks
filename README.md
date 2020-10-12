@@ -1,6 +1,6 @@
-# m-classic-epiphany-on-aks
+# m-generic-epiphany-on-aks
 
-Epiphany Module: Classic Epiphany on AKS
+Epiphany Module: Generic Epiphany on AKS
 
 # Prepare service principal
 

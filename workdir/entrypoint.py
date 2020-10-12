@@ -1,4 +1,4 @@
-"""Entrypoint for the "Classic Epiphany on AKS" module."""
+"""Entrypoint for the "Generic Epiphany on AKS" module."""
 
 import os
 import sys
