@@ -69,6 +69,8 @@ RUN : RUN LINTER \
 RUN : RUN UNIT TESTS \
  && pytest -vv $M_TESTS/unit/
 
+USER root:$HOST_GID
+
 # stage3: produce the final image
 
 FROM stage1 as stage3

@@ -174,6 +174,12 @@ def test_plan_minimal_cluster_with_applications():
         external_cache_dir = pathlib.Path(
             os.getenv("CACHE_DIR", "/shared")).resolve()
 
+        # Fix access rights to the docker socket file (needed in macOS)
+        os.system("chmod ugo+rw /var/run/docker.sock")
+
+        # Fix access rights so the image in test can read shared data
+        os.system("chown -R {HOST_UID}:{HOST_GID} /shared/".format(**os.environ))
+
         container = client.containers.run(
             DOCKER_IMAGE_NAME,
             auto_remove=False,
