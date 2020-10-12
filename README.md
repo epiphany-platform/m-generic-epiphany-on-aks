@@ -87,6 +87,11 @@ To automatically re-format all the python code to PEP8:
 $ make format
 ```
 
+To locally build epicli image from latest commits in develop branch:
+```shell
+$ make epicli-build
+```
+
 To run integration tests:
 ```shell
 $ make test
