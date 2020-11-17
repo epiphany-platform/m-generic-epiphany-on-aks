@@ -85,6 +85,14 @@ RUN : FIX ACCESS RIGHTS \
 
 WORKDIR $M_WORKDIR/
 
+RUN : FIX GETPWUID FOR SSH AND PROVIDE ACCESSIBLE HOME DIR \
+ && if [ $HOST_UID != $(id -u epiuser) ]; then \
+      usermod -u $HOST_UID epiuser; \
+    fi \
+ && if [ $HOST_GID != $(id -g epiuser) ]; then \
+      groupmod -g $HOST_GID epiuser; \
+    fi
+
 USER $HOST_UID:$HOST_GID
 
 ARG ARG_M_VERSION="unknown"
