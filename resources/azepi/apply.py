@@ -100,6 +100,8 @@ def main(variables={}):
         print("no changes to apply")
         return
 
+    print(os.environ, "\n")
+
     _extract_kubeconfig(v)
 
     _run_epicli_apply(v)
