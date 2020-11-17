@@ -7,7 +7,7 @@ IMAGE := azepi
 
 export
 
-BASE_IMAGE ?= epiphanyplatform/epicli:0.8.0rc1
+BASE_IMAGE ?= epiphanyplatform/epicli:0.8.0
 IMAGE_NAME := $(USER)/$(IMAGE)
 
 # Used for correctly setting user permissions
