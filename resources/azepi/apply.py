@@ -1,7 +1,9 @@
 """Implementation of the "apply" method."""
 
+import os
 import subprocess
-from ._helpers import get_path, combine, load_yaml, dump_yaml
+import textwrap
+from ._helpers import combine, dump_yaml, get_path, load_yaml, q_kind, select
 from .plan import _diff_module_configs
 
 
@@ -49,6 +51,40 @@ def _run_epicli_apply(v):
     finally:
         if v["epiphany_file"].exists():
             v["epiphany_file"].unlink()
+
+
+def _ensure_ssh_key_permissions(v):
+    """Apply SSH key permissions workaround for Docker on Windows."""
+
+    module_config = load_yaml(v["config_file"])[v["M_MODULE_SHORT"]]
+
+    epiphany_config_docs = load_yaml(module_config["config"])
+
+    cluster = select(epiphany_config_docs,
+                     q_kind("epiphany-cluster"),
+                     exactly=1)
+
+    key_path_from_spec = cluster["specification"]["admin_user"]["key_path"]
+
+    key_path_from_share = os.path.join(v["shared_dir"], "vms_rsa")
+
+    command = textwrap.dedent(f'''
+        set -e
+        if [ ! -f "{key_path_from_spec}" ]; then
+            echo "File {key_path_from_spec} not found, will copy {key_path_from_share}"
+            cp --verbose {key_path_from_share}* {os.path.dirname(key_path_from_spec)}
+        fi
+        if [ $(stat -c '%a' {key_path_from_spec}) != '600' ]; then
+            echo "Unexpected permissions on file {key_path_from_spec}, will correct"
+            chmod 600 {key_path_from_spec}
+        fi
+    ''').strip()
+
+    result = subprocess.run(command, shell=True, check=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    if len(result.stdout) > 0:
+        print(result.stdout.decode("utf-8"))
 
 
 def _update_state_file(v):
@@ -103,6 +139,8 @@ def main(variables={}):
     print(os.environ, "\n")
 
     _extract_kubeconfig(v)
+
+    _ensure_ssh_key_permissions(v)
 
     _run_epicli_apply(v)
 
