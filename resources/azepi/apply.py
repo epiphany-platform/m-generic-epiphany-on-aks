@@ -64,15 +64,15 @@ def _ensure_ssh_key_permissions(v):
                      q_kind("epiphany-cluster"),
                      exactly=1)
 
-    key_path_from_spec = cluster["specification"]["admin_user"]["key_path"]
+    key_path_from_spec = get_path(cluster["specification"]["admin_user"]["key_path"])
 
-    key_path_from_share = os.path.join(v["shared_dir"], "vms_rsa")
+    key_path_from_share = v["shared_dir"] / "vms_rsa"
 
     command = textwrap.dedent(f'''
         set -e
         if [ ! -f "{key_path_from_spec}" ]; then
             echo "File {key_path_from_spec} not found, will copy {key_path_from_share}"
-            cp --verbose {key_path_from_share}* {os.path.dirname(key_path_from_spec)}
+            cp --verbose {key_path_from_share}* {key_path_from_spec.parent}
         fi
         if [ $(stat -c '%a' {key_path_from_spec}) != '600' ]; then
             echo "Unexpected permissions on file {key_path_from_spec}, will correct"
