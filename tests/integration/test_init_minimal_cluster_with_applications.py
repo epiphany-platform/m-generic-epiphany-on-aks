@@ -128,8 +128,13 @@ def test_init_minimal_cluster_with_applications():
         with (shared_dir / "state.yml").open("w") as stream:
             stream.write(STATE_FILE_MOCK)
 
-        external_cache_dir = pathlib.Path(
-            os.getenv("CACHE_DIR", "/shared")).resolve()
+        cache_dir_env = os.getenv("CACHE_DIR", "/shared")
+
+        external_cache_dir = pathlib.Path(cache_dir_env).resolve()
+
+        # Fix for Windows to avoid path like "/workdir/C:/github/m-generic-epiphany-on-aks/.cache"
+        if not external_cache_dir.exists() and pathlib.PureWindowsPath(cache_dir_env).is_absolute():
+            external_cache_dir = pathlib.Path(cache_dir_env)
 
         # Fix access rights to the docker socket file (needed in macOS)
         os.system("chmod ugo+rw /var/run/docker.sock")

@@ -7,12 +7,15 @@ IMAGE := azepi
 
 export
 
-BASE_IMAGE ?= epiphanyplatform/epicli:0.8.0rc1
+BASE_IMAGE ?= epiphanyplatform/epicli:0.8.0
 IMAGE_NAME := $(USER)/$(IMAGE)
 
 # Used for correctly setting user permissions
 HOST_UID := $(shell id -u)
-HOST_GID := $(lastword $(shell stat -f "%g" /var/run/docker.sock 2>/dev/null || stat -c "%g" /var/run/docker.sock 2>/dev/null))
+# /var/run/docker.sock\;? is for Git Bash on Windows, which may create directory such as "C:\Program Files\Git\var\run\docker.sock;C"
+HOST_GID := $(lastword $(shell stat -f "%g" /var/run/docker.sock 2>/dev/null \
+                            || stat -c "%g" /var/run/docker.sock 2>/dev/null \
+                            || stat -c "%g" /var/run/docker.sock\;? 2>/dev/null))
 
 define DOCKER_BUILD
 docker build \
