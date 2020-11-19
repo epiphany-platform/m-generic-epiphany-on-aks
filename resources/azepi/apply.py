@@ -64,7 +64,8 @@ def _ensure_ssh_key_permissions(v):
                      q_kind("epiphany-cluster"),
                      exactly=1)
 
-    spec_key_path = get_path(cluster["specification"]["admin_user"]["key_path"])
+    spec_key_path = get_path(
+        cluster["specification"]["admin_user"]["key_path"])
 
     shared_dir_key_path = v["shared_dir"] / "vms_rsa"
 
