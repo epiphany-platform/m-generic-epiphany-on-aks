@@ -3,7 +3,7 @@ ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 M_NAME ?= mop-module-tests
 
 AZBI := epiphanyplatform/azbi:0.0.1
-AZKS := epiphanyplatform/azks:0.0.1
+AZKS := epiphanyplatform/azks:0.0.2
 AZEPI := epiphanyplatform/azepi:0.0.1
 
 VMS_RSA_FILENAME := vms_rsa
