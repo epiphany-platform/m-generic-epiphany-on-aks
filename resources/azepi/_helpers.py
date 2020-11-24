@@ -10,6 +10,10 @@ import ruamel.yaml
 
 def get_path(a_str):
     """Create and return resolved Path from a string."""
+
+    if a_str.startswith('~'):
+        return pathlib.Path(a_str).expanduser().resolve()
+
     return pathlib.Path(a_str).resolve()
 
 
