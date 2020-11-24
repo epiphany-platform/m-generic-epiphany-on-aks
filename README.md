@@ -2,7 +2,7 @@
 
 Epiphany Module: Generic Epiphany on AKS
 
-# Prepare service principal
+## Prepare service principal
 
 Have a look [here](https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html).
 
@@ -13,7 +13,7 @@ az account set --subscription="SUBSCRIPTION_ID"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/SUBSCRIPTION_ID" --name="SOME_MEANINGFUL_NAME" #get appID, password, tenant, name and displayName
 ```
 
-# Pull official epicli base image
+## Pull official epicli base image
 
 In main directory run:
 
@@ -21,7 +21,7 @@ In main directory run:
 make epicli-pull
 ```
 
-# Build image
+## Build image
 
 In main directory run:
 
@@ -29,7 +29,7 @@ In main directory run:
 make build
 ```
 
-# Deploy the basic\_flow example
+## Deploy the basic\_flow example
 
 __Please make sure that you have latest azbi and azks images in your local docker daemon.__
 
@@ -58,7 +58,7 @@ make init-azks plan-azks apply-azks
 make init-azepi plan-azepi apply-azepi
 ```
 
-# Destroy the basic\_flow example
+## Destroy the basic\_flow example
 
 In `examples/basic_flow` directory run (in order):
 
@@ -70,7 +70,7 @@ make plan-destroy-azks destroy-azks
 make plan-destroy-azbi destroy-azbi
 ```
 
-# For Developers
+## For Developers
 
 To install required pip packages into local environment (virtualenv):
 ```shell
@@ -96,3 +96,8 @@ To run integration tests:
 ```shell
 $ make test
 ```
+
+## Running on Windows
+
+When running `make apply-azepi` you may get error "Permissions 0755 for '/shared/vms_rsa' are too open".
+To workaround it, set `specification.admin_user.key_path` to a container FS directory, e.g. `~/vms_rsa`.
