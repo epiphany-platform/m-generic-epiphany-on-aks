@@ -44,15 +44,17 @@ epicli-pull: guard-IMAGE
 
 epicli-build: guard-IMAGE
 	@install -d $(CACHE_DIR)/epiphany/
-	cd $(CACHE_DIR)/epiphany/ && \
-	if git --git-dir=./.git/ rev-parse --is-inside-work-tree &>/dev/null; then \
-		git fetch origin develop \
-		&& git checkout develop \
-		&& git clean -df \
-		&& git reset --hard origin/develop; \
-	else \
-		git clone --branch=develop https://github.com/epiphany-platform/epiphany.git .; \
-	fi
+	{ \
+		cd $(CACHE_DIR)/epiphany/ && \
+		if git --git-dir=./.git/ rev-parse --is-inside-work-tree &>/dev/null; then \
+			git fetch origin develop && \
+			git checkout develop && \
+			git clean -df && \
+			git reset --hard origin/develop; \
+		else \
+			git clone --branch=develop https://github.com/epiphany-platform/epiphany.git .; \
+		fi; \
+	}
 	cd $(CACHE_DIR)/epiphany/ && docker build -t epicli:$(IMAGE) .
 
 build: guard-VERSION guard-IMAGE guard-USER
