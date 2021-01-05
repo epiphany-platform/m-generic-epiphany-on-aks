@@ -1,3 +1,4 @@
+SHELL := $(shell which bash)
 ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 CACHE_DIR := $(ROOT_DIR)/.cache
 
@@ -6,6 +7,9 @@ USER := epiphanyplatform
 IMAGE := azepi
 
 export
+
+EPICLI_REMOTE ?= https://github.com/epiphany-platform/epiphany.git
+EPICLI_BRANCH ?= develop
 
 BASE_IMAGE ?= epiphanyplatform/epicli:0.8.0
 IMAGE_NAME := $(USER)/$(IMAGE)
@@ -47,12 +51,13 @@ epicli-build: guard-IMAGE
 	{ \
 		cd $(CACHE_DIR)/epiphany/ && \
 		if git --git-dir=./.git/ rev-parse --is-inside-work-tree &>/dev/null; then \
-			git fetch origin develop && \
-			git checkout develop && \
+			git remote set-url origin $(EPICLI_REMOTE) && \
+			git fetch origin $(EPICLI_BRANCH) && \
+			git checkout $(EPICLI_BRANCH) && \
 			git clean -df && \
-			git reset --hard origin/develop; \
+			git reset --hard origin/$(EPICLI_BRANCH); \
 		else \
-			git clone --branch=develop https://github.com/epiphany-platform/epiphany.git .; \
+			git clone --branch=$(EPICLI_BRANCH) $(EPICLI_REMOTE) .; \
 		fi; \
 	}
 	cd $(CACHE_DIR)/epiphany/ && docker build -t epicli:$(IMAGE) .

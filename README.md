@@ -87,9 +87,14 @@ To automatically re-format all the python code to PEP8:
 $ make format
 ```
 
-To locally build epicli image from latest commits in develop branch:
+To locally build epicli image from latest commits in develop branch (and re-build azepi image):
 ```shell
-$ make epicli-build
+$ make epicli-build build
+```
+
+To locally build epicli from specific git repository and branch:
+```shell
+$ make epicli-build EPICLI_REMOTE=https://github.com/sk4zuzu/epiphany.git EPICLI_BRANCH=develop
 ```
 
 To run integration tests:
